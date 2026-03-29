@@ -1,0 +1,18 @@
+FROM arm64v8/php:8.5-fpm-alpine
+
+RUN apk add --no-cache \
+    caddy \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libwebp-dev
+
+RUN docker-php-ext-configure gd --with-jpeg --with-webp
+RUN docker-php-ext-install gd exif
+
+WORKDIR /var/www/html
+
+COPY _init/apple-container/Caddyfile /etc/caddy/Caddyfile
+
+EXPOSE 8000
+
+CMD sh -c "php-fpm -D && caddy run --config /etc/caddy/Caddyfile"
